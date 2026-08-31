@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Future Designers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --blue:#1565c0;--blue-dark:#0d4d9e;--blue-light:#38a8e8;
+      --ink:#152238;--muted:#687385;--line:#e7ecf2;--soft:#f4f7fb;--nav:#fff;
+      --radius-sm:8px;--radius-md:14px;--radius-lg:20px;
+      --shadow-sm:0 1px 3px rgba(15,40,90,.08), 0 1px 2px rgba(15,40,90,.06);
+      --shadow-md:0 8px 20px rgba(15,40,90,.10);
+      --shadow-lg:0 20px 45px rgba(6,23,46,.28);
+      --btn-shadow:0 4px 0 #0d4d9e, 0 6px 14px rgba(21,101,192,.35);
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:'Inter',Arial,sans-serif;color:var(--ink);background:var(--soft);-webkit-font-smoothing:antialiased} button,input,select{font:inherit}
+
+    /* ---------- Buttons: consistent "3D" press effect everywhere ---------- */
+    .primary{border:0;border-radius:10px;background:linear-gradient(180deg,#1b74d4,var(--blue));color:#fff;padding:11px 18px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;justify-content:center;box-shadow:var(--btn-shadow);transform:translateY(0);transition:transform .12s ease, box-shadow .12s ease, background .15s ease}
+    .primary:hover{background:linear-gradient(180deg,#2680e0,#1668c4);transform:translateY(-2px);box-shadow:0 6px 0 #0d4d9e, 0 12px 20px rgba(21,101,192,.4)}
+    .primary:active{transform:translateY(1px);box-shadow:0 2px 0 #0d4d9e, 0 3px 8px rgba(21,101,192,.35)}
+    .primary.secondary{background:#eaf2fb;color:#1565c0;box-shadow:0 4px 0 #cfe2f6, 0 6px 12px rgba(21,101,192,.12)}
+    .primary.secondary:hover{background:#d5e5f8;box-shadow:0 6px 0 #cfe2f6, 0 10px 16px rgba(21,101,192,.16)}
+    .primary.secondary:active{box-shadow:0 2px 0 #cfe2f6}
+    .full{width:100%;margin-top:14px;padding:13px 16px;font-size:15px}
+    .logout{border:1px solid #d6dee8;color:#485568;background:#fff;border-radius:9px;padding:8px 12px;cursor:pointer;box-shadow:0 2px 0 #e2e8f0;transition:transform .12s ease, box-shadow .12s ease}
+    .logout:hover{transform:translateY(-1px);box-shadow:0 3px 0 #d6dee8;background:#f7f9fc}
+    .logout:active{transform:translateY(1px);box-shadow:none}
+    .error{color:#b42318;font-size:13px;min-height:18px;margin:6px 0}
+
+    /* ---------- Login page ---------- */
+    #login{min-height:100vh;display:grid;place-items:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#08213f,#0d4d9e 45%,#1c86e0 100%)}
+    #login::before{content:'';position:absolute;inset:-20%;background:radial-gradient(circle at 20% 20%, rgba(255,255,255,.10), transparent 40%),radial-gradient(circle at 80% 75%, rgba(255,255,255,.08), transparent 45%);pointer-events:none}
+    .login-card{position:relative;width:min(92vw,380px);background:#fff;padding:38px 34px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);animation:rise .45s ease both}
+    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    .login-logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;margin:0 auto 18px;box-shadow:0 10px 20px rgba(21,101,192,.35)}
+    .login-card h1{margin:0 0 6px;color:var(--ink);font-size:24px;font-weight:800;text-align:center}
+    .login-card p{margin:0 0 24px;color:var(--muted);text-align:center;font-size:14px}
+    .field{width:100%;padding:12px 14px;border:1.5px solid #dde4ed;border-radius:10px;margin:7px 0;color:var(--ink);background:#fbfcfe;transition:border-color .15s ease, box-shadow .15s ease}
+    .field:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(21,101,192,.14);background:#fff}
+
+    /* ---------- App shell ---------- */
+    #app{display:none;min-height:100vh}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:4;box-shadow:var(--shadow-sm)}.brand{font-size:17px;font-weight:800;color:#114e9e;display:inline-flex;align-items:center;gap:10px}.brand::before{content:'';width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));display:inline-block}.brand small{color:var(--muted);font-weight:500}.user{display:flex;gap:10px;align-items:center;font-size:13px}
+    .icon-btn{border:0;background:transparent;font-size:25px;cursor:pointer;border-radius:8px;transition:background .12s ease}.icon-btn:hover{background:#eef3fa}
+
+    .shell{display:flex;min-height:calc(100vh - 64px)}.sidebar{width:245px;background:var(--nav);border-right:1px solid var(--line);padding:13px 8px;flex:none}.nav-item,.nav-parent{border:0;background:transparent;color:#4c596a;text-align:left;width:100%;padding:12px 13px;border-radius:10px;cursor:pointer;font-size:14px;display:flex;gap:10px;align-items:center;position:relative;transition:background .12s ease, color .12s ease}.nav-item:hover,.nav-parent:hover{background:#eef3fa;color:#0867d6}.nav-item.active{background:#e3f0fd;color:#0867d6;font-weight:700}.nav-item.active::before{content:'';position:absolute;left:-8px;top:8px;bottom:8px;width:4px;border-radius:4px;background:var(--blue)}.nav-child{padding-left:38px;font-size:13px}.nav-parent .chevron{margin-left:auto}.submenu{display:none}.submenu.open{display:block}.main{width:100%;padding:28px;overflow:auto}.page-title{margin:0 0 5px;font-size:24px;font-weight:800}.page-subtitle{color:var(--muted);margin:0 0 24px;font-size:14px}
+
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:16px;margin-bottom:22px}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm);transition:transform .15s ease, box-shadow .15s ease}.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}.card .label{color:var(--muted);font-size:13px}.card .value{font-size:27px;font-weight:800;color:var(--blue);padding-top:7px}.dashboard{background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}.dashboard iframe{border:0;width:100%;height:calc(100vh - 255px);min-height:550px}.empty-dashboard{padding:34px;color:var(--muted);line-height:1.6}.section-bar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.section-bar h1{margin:0}.section-title{font-size:16px;margin:26px 0 10px;color:#174c85}.table-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);overflow:auto;max-height:calc(100vh - 215px);margin-bottom:18px;box-shadow:var(--shadow-sm)}table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:13px}th{background:#eaf2fb;color:#174c85;text-align:left;padding:13px;border-bottom:1px solid #cbd9e7;position:sticky;top:0;z-index:2}td{padding:12px;border-bottom:1px solid var(--line);color:#455469}tr:hover td{background:#f7fbff}.message{background:#fff7e5;color:#855f00;padding:15px;border-radius:9px}.hidden{display:none!important}
+
+    .modal-backdrop{position:fixed;inset:0;background:rgba(10,23,41,.55);backdrop-filter:blur(2px);display:none;place-items:center;z-index:8}.modal{background:#fff;border-radius:16px;width:min(94vw,700px);max-height:88vh;overflow:auto;padding:24px;box-shadow:var(--shadow-lg);animation:rise .25s ease both}.modal-head{display:flex;justify-content:space-between;align-items:center}.modal h2{margin:0;font-size:19px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.form-grid label{font-size:12px;color:#536173;font-weight:bold}.form-grid input,.form-grid select{margin-top:5px}.notice{font-size:13px;color:#067647;margin-top:10px;min-height:18px}
+
+    .owners-hero{background:linear-gradient(115deg,#0d4d9e,#1674d1 58%,#35a5e5);border-radius:var(--radius-lg);padding:27px 30px;color:#fff;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 16px 34px rgba(23,101,182,.35)}.owners-hero h1{font-size:27px;margin:0 0 6px}.owners-hero p{margin:0;color:#dceeff}.owners-date{background:#ffffff1d;border:1px solid #ffffff38;border-radius:10px;padding:12px 16px;font-size:13px}.owners-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(270px,.8fr);gap:18px;align-items:start}.owner-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm)}.owner-card h2{font-size:15px;margin:0 0 16px;color:#174c85}.account-table th{background:#0f67be;color:#fff}.account-table tbody tr:nth-child(odd) td{background:#f7faff}.account-table .owner-name{display:flex;align-items:center;gap:9px;font-weight:700;color:#263b57}.avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:white;font-size:11px;background:linear-gradient(135deg,#1565c0,#38a8e8)}.account-table tfoot td{font-weight:800;background:#e6f1ff;color:#103f78;padding:13px}.owner-bars{display:grid;gap:14px}.owner-bar-row{display:grid;grid-template-columns:64px 1fr 80px;gap:10px;align-items:center;font-size:12px}.owner-bar-track{height:9px;background:#e6eef8;border-radius:10px;overflow:hidden}.owner-bar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#1771ce,#43b5e9)}.cash-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px}.mini-chip{font-size:12px;background:#e9f5ff;color:#0b66ba;padding:5px 9px;border-radius:20px}.table-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.table-heading h2{margin:0;font-size:16px;color:#174c85}.cheque-table th{background:#146cc3;color:#fff}.cash-table th{background:#075b92;color:#fff}.search-box{padding:8px 12px;border:1.5px solid #dde4ed;border-radius:9px;font-size:13px;width:220px;transition:border-color .15s ease, box-shadow .15s ease}.search-box:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.12)}
+
+    .skeleton{background:linear-gradient(90deg,#edf2f7 25%,#e2e8f0 37%,#edf2f7 63%);background-size:400% 100%;animation:skeleton-loading 1.4s ease infinite;border-radius:8px}.sk-card{height:100px;margin-bottom:16px}.sk-table{height:250px;margin-bottom:16px}
+    @keyframes skeleton-loading{0%{background-position:100% 50%}100%{background-position:0 50%}}
+    .stock-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .stock-tab{border:1.5px solid #dde4ed;background:#fff;color:#455469;padding:8px 14px;border-radius:9px;cursor:pointer;font-size:13px;transition:transform .12s ease, box-shadow .12s ease, background .12s ease}
+    .stock-tab:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(21,101,192,.15)}
+    .stock-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 3px 0 #0d4d9e}
+    .stock-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+    .stock-filters select{padding:8px 10px;border:1.5px solid #dde4ed;border-radius:9px;font-size:13px;color:var(--ink)}
+    tr.negative-row td{background:#fde8e8!important}
+    /* Fixed-height "peek 5 rows, scroll for the rest" tables (used for
+       Cheques/Cash Transactions on the Owners page). Row height here
+       (~41px) x 5 + the sticky header (~42px) = the max-height below. */
+    .table-card--compact{max-height:247px}
+    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+    .badge-due{background:#fde8e8;color:#b42318}
+    .badge-done{background:#e6f4ea;color:#1e7e34}
+    .badge-none{background:#eef1f5;color:#8a94a3}
+    tr.row-due td{background:#fff3f2}
+    tr.row-due:hover td{background:#ffe9e7}
+    @media(max-width:760px){.sidebar{position:fixed;left:-245px;top:64px;height:calc(100vh - 64px);z-index:6;transition:.2s}.sidebar.open{left:0}.topbar{padding:0 12px}.main{padding:18px}.stats,.owners-grid{grid-template-columns:1fr}.menu-toggle{display:inline-block}.form-grid{grid-template-columns:1fr}}@media(min-width:761px){.menu-toggle{display:none}}
+  </style>
+</head>
+<body>
+  <section id="login">
+    <form class="login-card" onsubmit="login(event)">
+      <div class="login-logo">FD</div>
+      <h1>Welcome back</h1>
+      <p>Sign in to Future Designers management system</p>
+      <div id="loginError" class="error"></div>
+      <input id="username" class="field" required placeholder="Username" autocomplete="username">
+      <input id="password" class="field" required placeholder="Password" type="password" autocomplete="current-password">
+      <button class="primary full">Sign in</button>
+    </form>
+  </section>
+
+  <section id="app">
+    <header class="topbar">
+      <div>
+        <button class="menu-toggle icon-btn" onclick="toggleMenu()">☰</button>
+        <span class="brand">Future Designers <small>Management System</small></span>
+      </div>
+      <div class="user">
+        <span id="userName"></span>
+        <button id="newEntryBtn" class="primary hidden" onclick="openEntryModal('database','Database','Add Database Entry')">+ New entry</button>
+        <button class="logout" onclick="signOut()">Logout</button>
+      </div>
+    </header>
+    <div class="shell">
+      <aside id="sidebar" class="sidebar">
+        <button class="nav-item active" data-home onclick="showHome()">⌂ <span>Home</span></button>
+        <div id="menu"></div>
+      </aside>
+      <main id="main" class="main"></main>
+    </div>
+  </section>
+
+  <div id="modalBackdrop" class="modal-backdrop">
+    <section class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">Add Record</h2>
+        <button class="icon-btn" onclick="closeModal()">×</button>
+      </div>
+      <form id="recordForm" onsubmit="saveRecord(event)">
+        <div id="formFields" class="form-grid"></div>
+        <div id="formNotice" class="notice"></div>
+        <button class="primary full">Save Entry</button>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    let sessionId = '', currentSheet = '', currentLabel = '', currentHeaders = [];
+    let modalMode = 'database', modalSheet = 'Database';
+    const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const call = (method, ...args) => new Promise((resolve, reject) => google.script.run.withSuccessHandler(resolve).withFailureHandler(error => reject(error.message || error))[method](...args));
+
+    async function login(event) {
+      event.preventDefault();
+      const error = document.getElementById('loginError');
+      error.textContent = '';
+      try {
+        const result = await call('checkLogin', username.value, password.value);
+        if (!result.success) { error.textContent = result.message; return; }
+        sessionId = result.sessionId;
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('userName').textContent = `${result.user} (${result.role})`;
+        const app = await call('getAppBootstrap', sessionId);
+        document.getElementById('newEntryBtn').classList.toggle('hidden', !app.canAddDatabase);
+        renderMenu(app.menu);
+        renderHome(app.overview, app.lookerEmbedUrl);
+      } catch (e) { error.textContent = e; }
+    }
+
+    function signOut() {
+      call('logout', sessionId);
+      location.reload();
+    }
+
+    function renderMenu(menu) {
+      const root = document.getElementById('menu');
+      root.innerHTML = menu.map((item, index) => item.children ?
+        `<div><button class="nav-parent" onclick="toggleGroup(${index})">${item.icon || '◌'} <span>${esc(item.label)}</span><span class="chevron">⌄</span></button><div id="group-${index}" class="submenu">${item.children.map(child => navButton(child, true)).join('')}</div></div>` :
+        navButton(item, false)
+      ).join('');
+    }
+
+    function navButton(item, child) {
+      return `<button class="nav-item ${child ? 'nav-child' : ''}" onclick="openSection('${esc(item.sheet)}','${esc(item.label)}')">${child ? '' : (item.icon || '◌')} <span>${esc(item.label)}</span></button>`;
+    }
+
+    function toggleGroup(index) { document.getElementById('group-' + index).classList.toggle('open'); }
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
+    function markActive(button) { document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); if (button) button.classList.add('active'); }
+
+    async function showHome() {
+      markActive(document.querySelector('[data-home]'));
+      try {
+        const app = await call('getAppBootstrap', sessionId);
+        renderHome(app.overview, app.lookerEmbedUrl);
+      } catch (e) { handleError(e); }
+    }
+
+    function renderHome(overview, lookerUrl) {
+      currentSheet = ''; currentLabel = '';
+      document.getElementById('main').innerHTML = `<h1 class="page-title">Home</h1><p class="page-subtitle">Your data and reports in one place.</p><div class="stats"><div class="card"><div class="label">Available sections</div><div class="value">${overview.sections}</div></div><div class="card"><div class="label">Records in Google Sheets</div><div class="value">${overview.records.toLocaleString()}</div></div><div class="card"><div class="label">Last refreshed</div><div class="value" style="font-size:16px">${esc(overview.updatedAt)}</div></div></div><div class="dashboard">${lookerUrl ? `<iframe src="${esc(lookerUrl)}" allowfullscreen></iframe>` : `<div class="empty-dashboard"><strong>Dashboard is ready for connection.</strong><br>In Looker Studio, enable <em>Embed report</em>, copy the generated embed URL, then paste it into <code>APP.lookerEmbedUrl</code> in Code.gs.</div>`}</div>`;
+    }
+
+    function renderSkeleton() {
+      document.getElementById('main').innerHTML = `<div class="skeleton sk-card"></div><div class="stats"><div class="skeleton sk-card"></div><div class="skeleton sk-card"></div><div class="skeleton sk-card"></div></div><div class="skeleton sk-table"></div>`;
+    }
+
+    async function openOwners(forceRefresh = false) {
+      document.getElementById('sidebar').classList.remove('open');
+      markActive(null);
+      currentSheet = 'Database'; currentLabel = 'Owners';
+      renderSkeleton();
+      try {
+        const data = await call('getOwnersDashboardData', sessionId, forceRefresh);
+        renderOwners(data);
+      } catch (e) { handleError(e); }
+    }
+
+    async function openSection(sheet, label) {
+      document.getElementById('sidebar').classList.remove('open');
+      markActive(null);
+      if (label === 'Owners') { openOwners(); return; }
+      if (label === 'Stock') { openStock(); return; }
+      currentSheet = sheet; currentLabel = label;
+      renderSkeleton();
+      try {
+        const data = await call('getSectionData', sessionId, sheet);
+        currentHeaders = data.headers;
+        renderSection(label, data);
+      } catch (e) { handleError(e); }
+    }
+
+    const money = (number, currency = 'EGP') => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(number || 0) + (currency === 'USD' ? ' $' : ' EGP');
+    const qty = n => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n || 0);
+
+    function renderOwners(data) {
+      const maxEgp = Math.max(...data.owners.map(o => Math.abs(o.totalEgp)), 1);
+      const rows = data.owners.map(o => `<tr><td><span class="owner-name"><span class="avatar">${esc(o.owner.slice(0, 2).toUpperCase())}</span>${esc(o.owner)}</span></td><td>${money(o.cashEgp)}</td><td style="color:#1467d2">${money(o.cashUsd, 'USD')}</td><td><strong>${money(o.totalEgp)}</strong></td><td>${money(o.chequesEgp)}</td></tr>`).join('') || '<tr><td colspan="5">No payment rows found.</td></tr>';
+      const bars = data.owners.map(o => `<div class="owner-bar-row"><strong>${esc(o.owner)}</strong><div class="owner-bar-track"><div class="owner-bar-fill" style="width:${Math.min(100, Math.abs(o.totalEgp) / maxEgp * 100)}%"></div></div><span>${money(o.totalEgp)}</span></div>`).join('') || '<p class="muted-note">No data available.</p>';
+
+      const dueBadge = status => status === 'Yes' ? '<span class="badge badge-due">Due</span>' : status === 'Done' ? '<span class="badge badge-done">Cleared</span>' : '<span class="badge badge-none">-</span>';
+      const chequeRows = data.chequeRows.map(r => `<tr class="searchable ${r.dueStatus === 'Yes' ? 'row-due' : ''}"><td>${esc(r.date)}</td><td>${esc(r.owner)}</td><td>${esc(r.customer)}</td><td>${esc(r.reference)}</td><td>${money(r.egp)}</td><td>${dueBadge(r.dueStatus)}</td></tr>`).join('') || '<tr><td colspan="6">No cheques found.</td></tr>';
+      const cashRows = data.cashRows.map(r => `<tr class="searchable"><td>${esc(r.owner)}</td><td>${esc(r.date)}</td><td>${esc(r.status)}</td><td>${esc(r.supplier)}</td><td>${esc(r.customer)}</td><td>${money(r.egp)}</td><td>${money(r.usd, 'USD')}</td><td>${esc(r.usdRate || '-')}</td><td>${money(r.usdEgp)}</td></tr>`).join('') || '<tr><td colspan="9">No cash transactions found.</td></tr>';
+
+      document.getElementById('main').innerHTML = `
+        <section class="owners-hero">
+          <div>
+            <h1>Valuation &amp; Owners’ Accounts</h1>
+            <p>Live statement from Database sheet</p>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button class="primary secondary" onclick="openOwners(true)">↻ Refresh</button>
+            <div class="owners-date">Last refreshed<br><strong>${new Date().toLocaleDateString()}</strong></div>
+          </div>
+        </section>
+        <div class="section-bar">
+          <div>
+            <h1 class="page-title">Owners Overview</h1>
+            <p class="page-subtitle">Only rows where Input = Payment and Date is filled are included.</p>
+          </div>
+          ${document.getElementById('newEntryBtn').classList.contains('hidden') ? '' : `<button class="primary" onclick="openEntryModal('database','Database','Add Database Entry')">+ New entry</button>`}
+        </div>
+        <div class="stats">
+          <div class="card"><div class="label">Cash EGP</div><div class="value">${money(data.totals.cashEgp)}</div></div>
+          <div class="card"><div class="label">Cash USD</div><div class="value">${money(data.totals.cashUsd, 'USD')}</div></div>
+          <div class="card"><div class="label">Total Cash EGP</div><div class="value">${money(data.totals.totalEgp)}</div></div>
+        </div>
+        <div class="owners-grid">
+          <section class="owner-card">
+            <div class="table-heading"><h2>Account Statement</h2><span class="mini-chip">Payment rows only</span></div>
+            <div class="table-card">
+              <table class="account-table">
+                <thead><tr><th>Owner</th><th>Cash EGP</th><th>Cash USD</th><th>Total Cash EGP</th><th>Cheques EGP</th></tr></thead>
+                <tbody>${rows}</tbody>
+                <tfoot><tr><td>Grand total</td><td>${money(data.totals.cashEgp)}</td><td>${money(data.totals.cashUsd, 'USD')}</td><td>${money(data.totals.totalEgp)}</td><td>${money(data.totals.chequesEgp)}</td></tr></tfoot>
+              </table>
+            </div>
+          </section>
+          <section class="owner-card">
+            <h2>EGP Distribution</h2>
+            <div class="owner-bars">${bars}</div>
+          </section>
+        </div>
+        <div class="cash-layout">
+          <section class="owner-card">
+            <div class="table-heading">
+              <h2>Cheques Transactions</h2>
+              <input type="text" class="search-box" placeholder="Search cheques..." onkeyup="filterTable(this)">
+            </div>
+            <div class="table-card table-card--compact">
+              <table class="cheque-table">
+                <thead><tr><th>Date</th><th>Owner</th><th>Customer</th><th>Reference</th><th>EGP Amount</th><th>Due</th></tr></thead>
+                <tbody>${chequeRows}</tbody>
+              </table>
+            </div>
+          </section>
+          <section class="owner-card">
+            <div class="table-heading">
+              <h2>Cash Transactions</h2>
+              <input type="text" class="search-box" placeholder="Search cash..." onkeyup="filterTable(this)">
+            </div>
+            <div class="table-card table-card--compact">
+              <table class="cash-table">
+                <thead><tr><th>Owner</th><th>Date</th><th>Status</th><th>Supplier</th><th>Customer</th><th>EGP</th><th>USD</th><th>USD Rate</th><th>USD EGP</th></tr></thead>
+                <tbody>${cashRows}</tbody>
+              </table>
+            </div>
+          </section>
+        </div>`;
+    }
+
+    let stockState = { data: null, supplier: 'All', zipperType: '', reference: '', search: '' };
+
+    async function openStock(forceRefresh = false) {
+      document.getElementById('sidebar').classList.remove('open');
+      markActive(null);
+      currentSheet = 'Database'; currentLabel = 'Stock';
+      renderSkeleton();
+      try {
+        const data = await call('getStockDashboardData', sessionId, forceRefresh);
+        renderStock(data);
+      } catch (e) { handleError(e); }
+    }
+
+    function renderStock(data) {
+      stockState = { data: data, supplier: 'All', zipperType: '', reference: '', search: '' };
+
+      const negativeSection = data.negativeItems.length ? `
+        <section class="owner-card" style="margin-bottom:18px;border-color:#f3c6c0">
+          <div class="table-heading"><h2 style="color:#b42318">⚠ Negative Stock Alerts</h2><span class="mini-chip" style="background:#fde8e8;color:#b42318">${data.negativeItems.length} item(s) below zero</span></div>
+          <div class="table-card">
+            <table class="cheque-table">
+              <thead><tr><th>Item Description</th><th>Length</th><th>Color</th><th>Supplier</th><th>Stock Avail Qty</th><th>Remain After Deliveries</th></tr></thead>
+              <tbody>${data.negativeItems.map(i => `<tr><td>${esc(i.item)}</td><td>${esc(i.length)}</td><td>${esc(i.color)}</td><td>${esc(i.supplier)}</td><td style="color:#b42318;font-weight:700">${qty(i.stockAvail)}</td><td style="color:#b42318;font-weight:700">${qty(i.remainAfter)}</td></tr>`).join('')}</tbody>
+            </table>
+          </div>
+        </section>` : '';
+
+      const supplierTabs = ['All'].concat(data.filters.suppliers).map(s => `<button class="stock-tab ${s === 'All' ? 'active' : ''}" data-supplier="${esc(s)}" onclick="setStockSupplier('${esc(s)}', this)">${esc(s)}</button>`).join('');
+      const opt = list => list.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+
+      document.getElementById('main').innerHTML = `
+        <section class="owners-hero">
+          <div><h1>Stock Overview</h1><p>Live inventory computed from Database transactions</p></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button class="primary secondary" onclick="openStock(true)">↻ Refresh</button>
+            <div class="owners-date">Last refreshed<br><strong>${new Date().toLocaleDateString()}</strong></div>
+          </div>
+        </section>
+        <div class="stats">
+          <div class="card"><div class="label">Stock Avail Qty</div><div class="value">${qty(data.totals.stockAvail)}</div></div>
+          <div class="card"><div class="label">Stock In Not Delivered</div><div class="value">${qty(data.totals.stockIn)}</div></div>
+          <div class="card"><div class="label">Order Out Not Delivered</div><div class="value">${qty(data.totals.orderOut)}</div></div>
+          <div class="card"><div class="label">Current Stock Remain</div><div class="value" style="color:#067647">${qty(data.totals.currentStockRemain)}</div></div>
+          <div class="card"><div class="label">Total Stock</div><div class="value" style="color:#067647">${qty(data.totals.totalStock)}</div></div>
+        </div>
+        ${negativeSection}
+        <div class="stock-tabs">${supplierTabs}</div>
+        <div class="stock-filters">
+          <select onchange="stockState.zipperType=this.value;updateStockTable()"><option value="">All Zipper Types</option>${opt(data.filters.zipperTypes)}</select>
+          <select onchange="stockState.reference=this.value;updateStockTable()"><option value="">All References</option>${opt(data.filters.references)}</select>
+          <input type="text" class="search-box" placeholder="Search item, length, color..." oninput="stockState.search=this.value;updateStockTable()">
+        </div>
+        <section class="owner-card">
+          <div class="table-heading"><h2>All Stock Items</h2><span class="mini-chip" id="stockCount"></span></div>
+          <div class="table-card">
+            <table class="cash-table">
+              <thead><tr><th>Item Description</th><th>Length</th><th>Color</th><th>Supplier</th><th>Stock Avail Qty</th><th>Stock In Not Delivered</th><th>Order Out Not Delivered</th><th>Remain Before ST Deliver</th><th>Remain After Deliveries</th></tr></thead>
+              <tbody id="stockTableBody"></tbody>
+            </table>
+          </div>
+        </section>`;
+
+      updateStockTable();
+    }
+
+    function setStockSupplier(supplier, button) {
+      stockState.supplier = supplier;
+      document.querySelectorAll('.stock-tab').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+      updateStockTable();
+    }
+
+    function updateStockTable() {
+      const s = stockState, term = s.search.toLowerCase();
+      const rows = s.data.items.filter(i =>
+        (s.supplier === 'All' || i.supplier === s.supplier) &&
+        (!s.zipperType || i.zipperType === s.zipperType) &&
+        (!s.reference || i.reference === s.reference) &&
+        (!term || (i.item + i.length + i.color).toLowerCase().includes(term))
+      );
+      document.getElementById('stockCount').textContent = rows.length + ' item(s)';
+      document.getElementById('stockTableBody').innerHTML = rows.map(i => `
+        <tr class="${i.negative ? 'negative-row' : ''}">
+          <td>${esc(i.item)}</td><td>${esc(i.length)}</td><td>${esc(i.color)}</td><td>${esc(i.supplier)}</td>
+          <td>${qty(i.stockAvail)}</td><td>${qty(i.stockIn)}</td><td>${qty(i.orderOut)}</td>
+          <td>${qty(i.remainBefore)}</td><td>${qty(i.remainAfter)}</td>
+        </tr>`).join('') || '<tr><td colspan="9">No stock records match your filters.</td></tr>';
+    }
+
+    function filterTable(input) {
+      const term = input.value.toLowerCase();
+      const table = input.closest('.owner-card').querySelector('tbody');
+      Array.from(table.getElementsByClassName('searchable')).forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+      });
+    }
+
+    function renderSection(label, data) {
+      const headers = data.headers.map(h => `<th>${esc(h)}</th>`).join('');
+      const rows = data.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="100">${esc(data.message || 'No records found.')}</td></tr>`;
+      document.getElementById('main').innerHTML = `
+        <div class="section-bar">
+          <div><h1 class="page-title">${esc(label)}</h1><p class="page-subtitle">View and manage records</p></div>
+          ${data.canAdd ? `<button class="primary" onclick="openEntryModal('section','${esc(data.sheetName)}','Add ${esc(label)} Record')">+ Add record</button>` : ''}
+        </div>
+        <div class="table-card"><table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    // mode: 'database' -> schema-driven Database form (blue headers + validation).
+    // mode: 'section'  -> plain form built from the current section's own headers.
+    async function openEntryModal(mode, sheetName, title) {
+      modalMode = mode;
+      modalSheet = sheetName;
+      document.getElementById('modalTitle').textContent = title || 'Add Record';
+      document.getElementById('formNotice').textContent = '';
+      document.getElementById('formFields').innerHTML = '<p>Loading fields...</p>';
+      document.getElementById('modalBackdrop').style.display = 'grid';
+
+      try {
+        if (mode === 'database') {
+          const schema = await call('getDatabaseEntrySchema', sessionId);
+          document.getElementById('formFields').innerHTML = schema.fields.map(f => `
+            <div>
+              <label>${esc(f.label)}</label>
+              ${f.options && f.options.length ?
+                `<select name="col_${f.column}" class="field"><option value="">-- Select --</option>${f.options.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>` :
+                `<input name="col_${f.column}" class="field" placeholder="${esc(f.label)}">`}
+            </div>`).join('');
+        } else {
+          // section mode: one text field per existing header on that sheet.
+          document.getElementById('formFields').innerHTML = currentHeaders.map((label, index) => `
+            <div>
+              <label>${esc(label)}</label>
+              <input name="idx_${index}" class="field" placeholder="${esc(label)}">
+            </div>`).join('');
+        }
+      } catch (e) {
+        document.getElementById('formFields').innerHTML = `<p class="error">${esc(e)}</p>`;
+      }
+    }
+
+    function closeModal() { document.getElementById('modalBackdrop').style.display = 'none'; }
+
+    async function saveRecord(e) {
+      e.preventDefault();
+      const form = e.target;
+      const notice = document.getElementById('formNotice');
+      notice.textContent = 'Saving...';
+
+      try {
+        let res;
+        if (modalMode === 'database') {
+          const values = {};
+          Array.from(form.elements).forEach(el => {
+            if (el.name && el.name.startsWith('col_')) values[el.name.replace('col_', '')] = el.value;
+          });
+          res = await call('saveDatabaseEntry', sessionId, values);
+        } else {
+          const record = {};
+          Array.from(form.elements).forEach(el => {
+            if (el.name && el.name.startsWith('idx_')) record[el.name.replace('idx_', '')] = el.value;
+          });
+          res = await call('addSectionRow', sessionId, modalSheet, record);
+        }
+        notice.textContent = res.message;
+        setTimeout(() => {
+          closeModal();
+          if (modalMode === 'database') {
+            if (currentLabel === 'Stock') openStock(true);
+            else openOwners(true);
+          } else if (currentSheet) {
+            openSection(currentSheet, currentLabel);
+          }
+        }, 1200);
+      } catch (err) {
+        notice.textContent = err;
+      }
+    }
+
+    function handleError(e) {
+      document.getElementById('main').innerHTML = `<div class="message"><strong>Error:</strong> ${esc(e)}</div>`;
+    }
+  </script>
+</body>
+</html>
