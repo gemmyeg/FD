@@ -80,6 +80,10 @@
     .stock-filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
     .stock-filters select{padding:8px 10px;border:1.5px solid #dde4ed;border-radius:9px;font-size:13px;color:var(--ink)}
     tr.negative-row td{background:#fde8e8!important}
+    .pagination{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 4px 2px;font-size:13px;color:var(--muted)}
+    .pagination button{border:1.5px solid #dde4ed;background:#fff;color:#455469;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px;transition:transform .12s ease, box-shadow .12s ease}
+    .pagination button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 3px 8px rgba(21,101,192,.15)}
+    .pagination button:disabled{opacity:.4;cursor:not-allowed}
     /* Fixed-height "peek 5 rows, scroll for the rest" tables (used for
        Cheques/Cash Transactions on the Owners page). Row height here
        (~41px) x 5 + the sticky header (~42px) = the max-height below. */
@@ -338,6 +342,7 @@
       markActive(null);
       if (label === 'Owners') { openOwners(); return; }
       if (label === 'Stock') { openStock(); return; }
+      if (label === 'Management') { openManagement(); return; }
       currentSheet = sheet; currentLabel = label;
       renderSkeleton();
       try {
@@ -556,7 +561,8 @@
       attachValuationChartEvents(series);
     }
 
-    let stockState = { data: null, supplier: 'All', zipperType: '', reference: '', search: '' };
+    let stockState = { data: null, supplier: 'All', zipperType: '', reference: '', search: '', viewMode: 'detail', page: 1 };
+    const STOCK_PAGE_SIZE = 100;
 
     async function openStock(forceRefresh = false) {
       document.getElementById('sidebar').classList.remove('open');
@@ -570,7 +576,7 @@
     }
 
     function renderStock(data) {
-      stockState = { data: data, supplier: 'All', zipperType: '', reference: '', search: '' };
+      stockState = { data: data, supplier: 'All', zipperType: '', reference: '', search: '', viewMode: 'detail', page: 1 };
 
       const negativeSection = data.negativeItems.length ? `
         <section class="owner-card" style="margin-bottom:18px;border-color:#f3c6c0">
@@ -604,18 +610,28 @@
         ${negativeSection}
         <div class="stock-tabs">${supplierTabs}</div>
         <div class="stock-filters">
-          <select onchange="stockState.zipperType=this.value;updateStockTable()"><option value="">All Zipper Types</option>${opt(data.filters.zipperTypes)}</select>
-          <select onchange="stockState.reference=this.value;updateStockTable()"><option value="">All References</option>${opt(data.filters.references)}</select>
-          <input type="text" class="search-box" placeholder="Search item, length, color..." oninput="stockState.search=this.value;updateStockTable()">
+          <select onchange="stockState.zipperType=this.value;stockState.page=1;updateStockTable()"><option value="">All Zipper Types</option>${opt(data.filters.zipperTypes)}</select>
+          <select onchange="stockState.reference=this.value;stockState.page=1;updateStockTable()"><option value="">All References</option>${opt(data.filters.references)}</select>
+          <input type="text" class="search-box" placeholder="Search item, length, color..." oninput="stockState.search=this.value;stockState.page=1;updateStockTable()">
         </div>
         <section class="owner-card">
-          <div class="table-heading"><h2>All Stock Items</h2><span class="mini-chip" id="stockCount"></span></div>
+          <div class="table-heading">
+            <h2>All Stock Items</h2>
+            <div style="display:flex;gap:14px;align-items:center">
+              <div style="display:flex;gap:6px">
+                <button id="viewDetailBtn" class="stock-tab active" onclick="setStockView('detail')">By Variant</button>
+                <button id="viewSummaryBtn" class="stock-tab" onclick="setStockView('summary')">All Lengths (Most Used)</button>
+              </div>
+              <span class="mini-chip" id="stockCount"></span>
+            </div>
+          </div>
           <div class="table-card">
             <table class="cash-table">
-              <thead><tr><th>Item Description</th><th>Length</th><th>Color</th><th>Supplier</th><th>Stock Avail Qty</th><th>Stock In Not Delivered</th><th>Order Out Not Delivered</th><th>Remain Before ST Deliver</th><th>Remain After Deliveries</th></tr></thead>
+              <thead id="stockTableHead"></thead>
               <tbody id="stockTableBody"></tbody>
             </table>
           </div>
+          <div class="pagination" id="stockPagination"></div>
         </section>`;
 
       updateStockTable();
@@ -623,26 +639,212 @@
 
     function setStockSupplier(supplier, button) {
       stockState.supplier = supplier;
-      document.querySelectorAll('.stock-tab').forEach(b => b.classList.remove('active'));
+      stockState.page = 1;
+      document.querySelectorAll('.stock-tab[data-supplier]').forEach(b => b.classList.remove('active'));
       button.classList.add('active');
       updateStockTable();
     }
 
+    function setStockView(mode) {
+      stockState.viewMode = mode;
+      stockState.page = 1;
+      document.getElementById('viewDetailBtn').classList.toggle('active', mode === 'detail');
+      document.getElementById('viewSummaryBtn').classList.toggle('active', mode === 'summary');
+      updateStockTable();
+    }
+
+    function stockGoToPage(page) {
+      stockState.page = page;
+      updateStockTable();
+    }
+
+    function renderStockPagination(totalRows) {
+      const totalPages = Math.max(1, Math.ceil(totalRows / STOCK_PAGE_SIZE));
+      if (stockState.page > totalPages) stockState.page = totalPages;
+      const page = stockState.page;
+      document.getElementById('stockPagination').innerHTML = totalRows === 0 ? '' : `
+        <span>Page ${page} of ${totalPages} (${qty(totalRows)} rows)</span>
+        <button onclick="stockGoToPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>‹ Prev</button>
+        <button onclick="stockGoToPage(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>Next ›</button>`;
+    }
+
     function updateStockTable() {
       const s = stockState, term = s.search.toLowerCase();
-      const rows = s.data.items.filter(i =>
+      const filtered = s.data.items.filter(i =>
         (s.supplier === 'All' || i.supplier === s.supplier) &&
         (!s.zipperType || i.zipperType === s.zipperType) &&
         (!s.reference || i.reference === s.reference) &&
         (!term || (i.item + i.length + i.color).toLowerCase().includes(term))
       );
-      document.getElementById('stockCount').textContent = rows.length + ' item(s)';
-      document.getElementById('stockTableBody').innerHTML = rows.map(i => `
+
+      if (s.viewMode === 'summary') {
+        const groups = {};
+        filtered.forEach(i => {
+          if (!groups[i.item]) groups[i.item] = { item: i.item, stockAvail: 0, stockIn: 0, orderOut: 0 };
+          groups[i.item].stockAvail += i.stockAvail;
+          groups[i.item].stockIn += i.stockIn;
+          groups[i.item].orderOut += i.orderOut;
+        });
+        const rows = Object.values(groups).map(g => {
+          g.remainBefore = g.stockAvail - g.orderOut;
+          g.remainAfter = g.stockAvail + g.stockIn - g.orderOut;
+          g.negative = g.remainAfter < 0 || g.stockAvail < 0;
+          return g;
+        }).sort((a, b) => b.stockAvail - a.stockAvail);
+
+        document.getElementById('stockCount').textContent = rows.length + ' item(s)';
+        document.getElementById('stockTableHead').innerHTML = '<tr><th>Item Description</th><th>Stock Avail Qty</th><th>Stock In Not Delivered</th><th>Order Out Not Delivered</th><th>Remain Before ST Deliver</th><th>Remain After Deliveries</th></tr>';
+        const pageRows = rows.slice((s.page - 1) * STOCK_PAGE_SIZE, s.page * STOCK_PAGE_SIZE);
+        document.getElementById('stockTableBody').innerHTML = pageRows.map(g => `
+          <tr class="${g.negative ? 'negative-row' : ''}">
+            <td>${esc(g.item)}</td>
+            <td>${qty(g.stockAvail)}</td><td>${qty(g.stockIn)}</td><td>${qty(g.orderOut)}</td>
+            <td>${qty(g.remainBefore)}</td><td>${qty(g.remainAfter)}</td>
+          </tr>`).join('') || '<tr><td colspan="6">No stock records match your filters.</td></tr>';
+        renderStockPagination(rows.length);
+        return;
+      }
+
+      document.getElementById('stockTableHead').innerHTML = '<tr><th>Item Description</th><th>Length</th><th>Color</th><th>Supplier</th><th>Stock Avail Qty</th><th>Stock In Not Delivered</th><th>Order Out Not Delivered</th><th>Remain Before ST Deliver</th><th>Remain After Deliveries</th></tr>';
+      document.getElementById('stockCount').textContent = filtered.length + ' item(s)';
+      const pageRows = filtered.slice((s.page - 1) * STOCK_PAGE_SIZE, s.page * STOCK_PAGE_SIZE);
+      document.getElementById('stockTableBody').innerHTML = pageRows.map(i => `
         <tr class="${i.negative ? 'negative-row' : ''}">
           <td>${esc(i.item)}</td><td>${esc(i.length)}</td><td>${esc(i.color)}</td><td>${esc(i.supplier)}</td>
           <td>${qty(i.stockAvail)}</td><td>${qty(i.stockIn)}</td><td>${qty(i.orderOut)}</td>
           <td>${qty(i.remainBefore)}</td><td>${qty(i.remainAfter)}</td>
         </tr>`).join('') || '<tr><td colspan="9">No stock records match your filters.</td></tr>';
+      renderStockPagination(filtered.length);
+    }
+
+    let managementState = { data: null, type: 'All', delivery: 'All', category: 'All', customer: '', supplier: '', reference: '', search: '', view: 'ledger' };
+
+    async function openManagement(forceRefresh = false) {
+      document.getElementById('sidebar').classList.remove('open');
+      markActive(null);
+      currentSheet = 'Database'; currentLabel = 'Management';
+      renderSkeleton();
+      try {
+        const data = await call('getManagementData', sessionId, forceRefresh);
+        renderManagement(data);
+      } catch (e) { handleError(e); }
+    }
+
+    function renderManagement(data) {
+      managementState = { data: data, type: 'All', delivery: 'All', category: 'All', customer: '', supplier: '', reference: '', search: '', view: 'ledger' };
+      const opt = list => list.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+
+      document.getElementById('main').innerHTML = `
+        <section class="owners-hero">
+          <div><h1>Management — Orders &amp; Stock Follow-up</h1><p>Track pending customer orders and stock movement in one place</p></div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button class="primary secondary" onclick="openManagement(true)">↻ Refresh</button>
+            <div class="owners-date">Last refreshed<br><strong>${new Date().toLocaleDateString()}</strong></div>
+          </div>
+        </section>
+        <div class="stats">
+          <div class="card"><div class="label">Total Qty (current filters)</div><div class="value" id="mgmtStatQty">${qty(data.totals.totalQty)}</div></div>
+          <div class="card"><div class="label">Total Value (current filters)</div><div class="value" id="mgmtStatPrice">${money(data.totals.totalPrice)}</div></div>
+          <div class="card"><div class="label" style="color:#b45409">Unpriced Items (current filters)</div><div class="value" id="mgmtStatUnpriced" style="color:#b45409">0</div></div>
+          <div class="card"><div class="label" style="color:#b45409">Pending Customer Orders <span style="font-weight:400">(overall)</span></div><div class="value" style="color:#b45409">${qty(data.totals.pendingCount)} <span style="font-size:14px;font-weight:400;color:var(--muted)">(${qty(data.totals.pendingQty)} units)</span></div></div>
+          <div class="card"><div class="label" style="color:#b45409">Pending Order Value <span style="font-weight:400">(overall)</span></div><div class="value" style="color:#b45409">${money(data.totals.pendingValue)}</div></div>
+        </div>
+        <div class="stock-tabs">
+          <button class="stock-tab active" id="mgmtTypeAll" onclick="setMgmt('type','All')">All Types</button>
+          <button class="stock-tab" id="mgmtTypeOrder" onclick="setMgmt('type','Order')">Orders Only</button>
+          <button class="stock-tab" id="mgmtTypeStock" onclick="setMgmt('type','Stock')">Stock Only</button>
+          <button class="stock-tab" id="mgmtPendingShortcut" onclick="setPendingView()">⚠ Pending Orders Only</button>
+        </div>
+        <div class="stock-tabs">
+          <button class="stock-tab active" id="mgmtDeliveryAll" onclick="setMgmt('delivery','All')">Delivered + Not Delivered</button>
+          <button class="stock-tab" id="mgmtDeliveryYes" onclick="setMgmt('delivery','Delivered')">Delivered</button>
+          <button class="stock-tab" id="mgmtDeliveryNo" onclick="setMgmt('delivery','Not Delivered')">Not Delivered</button>
+        </div>
+        <div class="stock-tabs">
+          <button class="stock-tab active" id="mgmtCatAll" onclick="setMgmt('category','All')">All Items</button>
+          <button class="stock-tab" id="mgmtCatMain" onclick="setMgmt('category','Main')">Main Items (Zipper)</button>
+          <button class="stock-tab" id="mgmtCatOther" onclick="setMgmt('category','Other')">Other Items</button>
+        </div>
+        <div class="stock-filters">
+          <select onchange="managementState.customer=this.value;updateManagementTable()"><option value="">All Customers</option>${opt(data.filters.customers)}</select>
+          <select onchange="managementState.supplier=this.value;updateManagementTable()"><option value="">All Suppliers</option>${opt(data.filters.suppliers)}</select>
+          <select onchange="managementState.reference=this.value;updateManagementTable()"><option value="">All References</option>${opt(data.filters.references)}</select>
+          <input type="text" class="search-box" placeholder="Search item, length, color..." oninput="managementState.search=this.value;updateManagementTable()">
+        </div>
+        <section class="owner-card">
+          <div class="table-heading"><h2 id="mgmtTableTitle">Transaction Ledger</h2><span class="mini-chip" id="mgmtCount"></span></div>
+          ${data.truncated ? `<p class="page-subtitle" style="margin-top:-6px">Showing the most recent 500 matching rows (of a larger total) for performance — narrow your filters for a complete view of a smaller slice.</p>` : ''}
+          <div class="table-card">
+            <table class="cash-table">
+              <thead><tr><th>Date</th><th>Type</th><th>Status</th><th>Customer</th><th>Supplier</th><th>Item Description</th><th>Length</th><th>Color</th><th>Qty</th><th>Unit Price</th><th>Total Price</th><th>Reference</th></tr></thead>
+              <tbody id="mgmtTableBody"></tbody>
+            </table>
+          </div>
+        </section>`;
+
+      updateManagementTable();
+      updateManagementStats();
+    }
+
+    function updateManagementStats() {
+      const s = managementState;
+      let qtySum = 0, priceSum = 0, unpricedSum = 0;
+      Object.keys(s.data.buckets || {}).forEach(key => {
+        const [bType, bDelivered, bCategory] = key.split('|');
+        const typeMatch = s.type === 'All' || bType === s.type.toLowerCase();
+        const deliveryMatch = s.delivery === 'All' || (s.delivery === 'Delivered' ? bDelivered === 'delivered' : bDelivered === 'pending');
+        const categoryMatch = s.category === 'All' || bCategory === s.category.toLowerCase();
+        if (typeMatch && deliveryMatch && categoryMatch) {
+          const b = s.data.buckets[key];
+          qtySum += b.qty; priceSum += b.totalPrice; unpricedSum += b.unpriced;
+        }
+      });
+      document.getElementById('mgmtStatQty').textContent = qty(qtySum);
+      document.getElementById('mgmtStatPrice').textContent = money(priceSum);
+      document.getElementById('mgmtStatUnpriced').textContent = qty(unpricedSum);
+    }
+
+    function setMgmt(field, value) {
+      managementState[field] = value;
+      managementState.view = 'ledger';
+      const groupPrefix = field === 'type' ? 'mgmtType' : field === 'delivery' ? 'mgmtDelivery' : 'mgmtCat';
+      document.querySelectorAll(`[id^="${groupPrefix}"]`).forEach(b => b.classList.remove('active'));
+      const idMap = { 'All': 'All', 'Order': 'Order', 'Stock': 'Stock', 'Delivered': 'Yes', 'Not Delivered': 'No', 'Main': 'Main', 'Other': 'Other' };
+      const target = document.getElementById(groupPrefix + (idMap[value] || value));
+      if (target) target.classList.add('active');
+      document.getElementById('mgmtPendingShortcut').classList.remove('active');
+      updateManagementTable();
+      updateManagementStats();
+    }
+
+    function setPendingView() {
+      managementState.view = 'pending';
+      document.querySelectorAll('.stock-tabs .stock-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('mgmtPendingShortcut').classList.add('active');
+      updateManagementTable();
+    }
+
+    function updateManagementTable() {
+      const s = managementState, term = s.search.toLowerCase();
+      const source = s.view === 'pending' ? s.data.pendingOrders : s.data.recentTransactions;
+      const rows = source.filter(r =>
+        (s.view === 'pending' || s.type === 'All' || r.type === s.type) &&
+        (s.view === 'pending' || s.delivery === 'All' || (s.delivery === 'Delivered' ? r.delivered : !r.delivered)) &&
+        (s.category === 'All' || (s.category === 'Main' ? r.isMain : !r.isMain)) &&
+        (!s.customer || r.customer === s.customer) &&
+        (!s.supplier || r.supplier === s.supplier) &&
+        (!s.reference || r.reference === s.reference) &&
+        (!term || (r.item + r.length + r.color).toLowerCase().includes(term))
+      );
+      document.getElementById('mgmtTableTitle').textContent = s.view === 'pending' ? 'Pending Customer Orders' : 'Transaction Ledger';
+      document.getElementById('mgmtCount').textContent = rows.length + ' row(s)';
+      document.getElementById('mgmtTableBody').innerHTML = rows.map(r => `
+        <tr class="${r.pending ? 'negative-row' : ''}">
+          <td>${esc(r.date)}</td><td>${esc(r.type)} ${esc(r.direction)}</td><td>${esc(r.status)}</td>
+          <td>${esc(r.customer || '-')}</td><td>${esc(r.supplier || '-')}</td>
+          <td>${esc(r.item)}</td><td>${esc(r.length)}</td><td>${esc(r.color)}</td>
+          <td>${qty(r.qty)}</td><td>${money(r.unitPrice)}</td><td>${money(r.totalPrice)}</td><td>${esc(r.reference || '-')}</td>
+        </tr>`).join('') || '<tr><td colspan="12">No records match your filters.</td></tr>';
     }
 
     function filterTable(input) {
