@@ -64,6 +64,11 @@
     .valuation-hover-dot{fill:#fff;stroke:var(--blue);stroke-width:2;opacity:0;pointer-events:none;transition:opacity .1s ease}
     .valuation-overlay{fill:transparent;pointer-events:all;cursor:crosshair}
     .valuation-tooltip{position:absolute;left:0;top:0;pointer-events:none;background:#103f78;color:#fff;font-size:12px;line-height:1.5;padding:7px 11px;border-radius:8px;box-shadow:0 6px 16px rgba(16,63,120,.28);opacity:0;transform:translate(-50%,-115%);white-space:nowrap;transition:opacity .1s ease;z-index:5}
+    .valuation-legend{display:flex;align-items:center;gap:7px;font-size:12px;color:#455469;font-weight:600;margin:2px 0 2px}
+    .valuation-legend-dot{width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block}
+    .valuation-point-label{font-size:9px;fill:#1467d2;font-weight:700;font-family:'Inter',Arial,sans-serif}
+    .valuation-point-dot{fill:var(--blue)}
+    .valuation-trend-line{fill:none;stroke:#c0392b;stroke-width:1.5;stroke-dasharray:5 4;opacity:.7}
 
     .skeleton{background:linear-gradient(90deg,#edf2f7 25%,#e2e8f0 37%,#edf2f7 63%);background-size:400% 100%;animation:skeleton-loading 1.4s ease infinite;border-radius:8px}.sk-card{height:100px;margin-bottom:16px}.sk-table{height:250px;margin-bottom:16px}
     @keyframes skeleton-loading{0%{background-position:100% 50%}100%{background-position:0 50%}}
@@ -339,6 +344,21 @@
       return { minV, maxV, xFor, yFor };
     }
 
+    // Least-squares linear regression over (index, total) - drawn as the
+    // dashed reference line alongside the actual monthly line, matching the
+    // trendline Gemmy's Looker Studio report shows next to the real series.
+    function linearTrend(series) {
+      const n = series.length;
+      if (n < 2) return null;
+      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+      series.forEach((s, i) => { sumX += i; sumY += s.total; sumXY += i * s.total; sumXX += i * i; });
+      const denom = n * sumXX - sumX * sumX;
+      if (!denom) return null;
+      const slope = (n * sumXY - sumX * sumY) / denom;
+      const intercept = (sumY - slope * sumX) / n;
+      return { at: i => intercept + slope * i };
+    }
+
     function renderValuationChart(series) {
       if (!series.length) return '<p class="muted-note" style="padding:18px 4px">No monthly history yet - add dated rows to see the trend.</p>';
       const { minV, maxV, xFor, yFor } = valuationScales(series);
@@ -351,7 +371,18 @@
       const endLabelAnchor = endNearRight ? 'end' : 'start';
       const endLabelX = endNearRight ? last.x - 8 : last.x + 8;
       const endLabelY = last.y < VB_TOP + 14 ? last.y + 16 : last.y - 10;
+
+      const trend = linearTrend(series);
+      const trendPath = trend ? 'M' + points.map((p, i) => `${p.x.toFixed(1)},${yFor(trend.at(i)).toFixed(1)}`).join(' L') : '';
+
+      // Every point gets its own small value label, angled and cascading
+      // along the line the way the reference report shows it - dense on
+      // purpose, since Gemmy asked to match that look exactly rather than
+      // the usual "label the endpoint only" convention.
+      const pointMarks = points.map(p => `<circle class="valuation-point-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.2"></circle><text class="valuation-point-label" x="${p.x.toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="start" transform="rotate(-38 ${p.x.toFixed(1)} ${(p.y - 8).toFixed(1)})">${esc(moneyShort(p.total))}</text>`).join('');
+
       return `
+        <div class="valuation-legend"><span class="valuation-legend-dot"></span>Company Valuation</div>
         <svg viewBox="0 0 ${VB_W} ${VB_H}" preserveAspectRatio="none" role="img" aria-label="Company valuation by month">
           <line class="valuation-grid-line" x1="${VB_LEFT}" y1="${VB_TOP}" x2="${VB_RIGHT}" y2="${VB_TOP}"></line>
           <line class="valuation-grid-line" x1="${VB_LEFT}" y1="${(VB_TOP + VB_BOTTOM) / 2}" x2="${VB_RIGHT}" y2="${(VB_TOP + VB_BOTTOM) / 2}"></line>
@@ -360,7 +391,9 @@
           <text class="valuation-axis-label" x="${VB_LEFT - 8}" y="${(VB_TOP + VB_BOTTOM) / 2 + 4}" text-anchor="end">${esc(moneyShort(midV))}</text>
           <text class="valuation-axis-label" x="${VB_LEFT - 8}" y="${VB_BOTTOM + 4}" text-anchor="end">${esc(moneyShort(minV))}</text>
           <path class="valuation-area" d="${areaPath}"></path>
+          ${trendPath ? `<path class="valuation-trend-line" d="${trendPath}"></path>` : ''}
           <path class="valuation-line" d="${linePath}"></path>
+          ${pointMarks}
           <circle class="valuation-end-dot" cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="4"></circle>
           <text class="valuation-end-label" x="${endLabelX.toFixed(1)}" y="${endLabelY.toFixed(1)}" text-anchor="${endLabelAnchor}">${esc(money(last.total))}</text>
           <text class="valuation-axis-label" x="${points[0].x.toFixed(1)}" y="${VB_BOTTOM + 22}" text-anchor="start">${esc(points[0].label)}</text>
@@ -449,6 +482,11 @@
             ${document.getElementById('newEntryBtn').classList.contains('hidden') ? '' : `<button class="primary" onclick="openEntryModal('database','Database','Add Database Entry')">+ New entry</button>`}
           </div>
         </div>
+        <section class="owner-card valuation-card">
+          <div class="table-heading"><h2>Company Valuation</h2><span class="mini-chip">All-time, monthly trend</span></div>
+          <div class="valuation-total">${money(valuationTotal)}</div>
+          <div class="valuation-chart-wrap" id="valuationChartWrap">${renderValuationChart(series)}</div>
+        </section>
         <section class="owner-card">
           <div class="table-heading"><h2>Account Statement</h2><span class="mini-chip">Payment rows only</span></div>
           <div class="table-card">
@@ -458,11 +496,6 @@
               <tfoot><tr><td>Grand total</td><td>${money(data.totals.cashEgp)}</td><td>${money(data.totals.cashUsd, 'USD')}</td><td>${money(data.totals.totalEgp)}</td><td>${money(data.totals.chequesEgp)}</td></tr></tfoot>
             </table>
           </div>
-        </section>
-        <section class="owner-card valuation-card">
-          <div class="table-heading"><h2>Company Valuation</h2><span class="mini-chip">All-time, monthly trend</span></div>
-          <div class="valuation-total">${money(valuationTotal)}</div>
-          <div class="valuation-chart-wrap" id="valuationChartWrap">${renderValuationChart(series)}</div>
         </section>
         <div class="cash-layout">
           <section class="owner-card">
