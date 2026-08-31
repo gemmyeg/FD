@@ -188,20 +188,35 @@
     // text/plain keeps this a CORS "simple request" so the browser
     // doesn't send a preflight OPTIONS call, which Apps Script web apps
     // don't answer.
+    // A request that never resolves (a dropped connection, a stuck Apps
+    // Script execution, ...) used to leave the caller's await hanging
+    // forever with the loading bar frozen at its last stage and no
+    // error ever shown. AbortController turns that silent hang into a
+    // real rejection after CALL_TIMEOUT_MS, so handleError() always
+    // gets a chance to run.
+    const CALL_TIMEOUT_MS = 45000;
     const call = (method, ...args) => {
       if (!API_URL || API_URL.indexOf('PASTE_YOUR') === 0) {
         return Promise.reject(new Error('API_URL is not set yet - paste your Apps Script Web App /exec URL at the top of the script.'));
       }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
       return fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: method, args: args }),
+        signal: controller.signal,
       })
         .then(res => res.json())
         .then(res => {
           if (!res || res.success === false) throw new Error((res && res.message) || 'Request failed.');
           return res.data;
-        });
+        })
+        .catch(err => {
+          if (err && err.name === 'AbortError') throw new Error('The server took too long to respond (over 45s) - please try again, or check your connection.');
+          throw err;
+        })
+        .finally(() => clearTimeout(timeoutId));
     };
 
     async function login(event) {
