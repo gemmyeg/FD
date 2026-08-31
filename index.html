@@ -55,7 +55,15 @@
 
     .owners-hero{background:linear-gradient(115deg,#0d4d9e,#1674d1 58%,#35a5e5);border-radius:var(--radius-lg);padding:27px 30px;color:#fff;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 16px 34px rgba(23,101,182,.35)}.owners-hero h1{font-size:27px;margin:0 0 6px}.owners-hero p{margin:0;color:#dceeff}.owners-date{background:#ffffff1d;border:1px solid #ffffff38;border-radius:10px;padding:12px 16px;font-size:13px}.owners-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(270px,.8fr);gap:18px;align-items:start}.owner-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm)}.owner-card h2{font-size:15px;margin:0 0 16px;color:#174c85}.account-table th{background:#0f67be;color:#fff}.account-table tbody tr:nth-child(odd) td{background:#f7faff}.account-table .owner-name{display:flex;align-items:center;gap:9px;font-weight:700;color:#263b57}.avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:white;font-size:11px;background:linear-gradient(135deg,#1565c0,#38a8e8)}.account-table tfoot td{font-weight:800;background:#e6f1ff;color:#103f78;padding:14px 13px;font-size:16px}.owner-bars{display:grid;gap:14px}.owner-bar-row{display:grid;grid-template-columns:64px 1fr 80px;gap:10px;align-items:center;font-size:12px}.owner-bar-track{height:9px;background:#e6eef8;border-radius:10px;overflow:hidden}.owner-bar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#1771ce,#43b5e9)}.cash-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px}.mini-chip{font-size:12px;background:#e9f5ff;color:#0b66ba;padding:5px 9px;border-radius:20px}.table-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.table-heading h2{margin:0;font-size:16px;color:#174c85}.cheque-table th{background:#146cc3;color:#fff}.cash-table th{background:#075b92;color:#fff}.search-box{padding:8px 12px;border:1.5px solid #dde4ed;border-radius:9px;font-size:13px;width:220px;transition:border-color .15s ease, box-shadow .15s ease}.search-box:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.12)}
     .date-filter-wrap{position:relative}.date-filter-trigger{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;font-size:13px;font-weight:700;color:#263b57;box-shadow:var(--shadow-sm);transition:border-color .15s ease}.date-filter-trigger:hover{border-color:var(--blue)}.date-filter-trigger svg{width:16px;height:16px;color:var(--blue);flex:none}.date-filter-popover{position:absolute;top:calc(100% + 8px);right:0;z-index:6;background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:16px;display:none;min-width:250px}.date-filter-popover.open{display:block}.date-filter-popover label{display:block;font-size:12px;font-weight:700;color:#536173;margin-bottom:5px}.date-filter-popover input[type=date]{width:100%;box-sizing:border-box;padding:8px 9px;border:1.5px solid #dde4ed;border-radius:8px;font-size:13px;color:#263b57;margin-bottom:12px}.date-filter-popover input[type=date]:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.12)}.date-filter-popover .actions{display:flex;justify-content:flex-end;gap:8px}
-    .valuation-card{margin-top:18px}.valuation-total{font-size:32px;font-weight:800;color:var(--blue);margin:8px 0 18px}.valuation-breakdown{display:grid;gap:2px}.valuation-row{display:flex;justify-content:space-between;font-size:13px;color:#455469;padding:9px 2px;border-bottom:1px solid var(--line)}.valuation-row:last-child{border-bottom:none;font-weight:700;color:#174c85}
+    .valuation-card{margin-top:18px}.valuation-total{font-size:32px;font-weight:800;color:var(--blue);margin:8px 0 4px}
+    .valuation-chart-wrap{position:relative;margin-top:10px}.valuation-chart-wrap svg{width:100%;height:220px;display:block;overflow:visible}
+    .valuation-grid-line{stroke:#e7ecf2;stroke-width:1}.valuation-axis-label{font-size:11px;fill:var(--muted);font-family:'Inter',Arial,sans-serif}
+    .valuation-area{fill:var(--blue);opacity:.08}.valuation-line{fill:none;stroke:var(--blue);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+    .valuation-end-dot{fill:var(--blue)}.valuation-end-label{font-size:12px;font-weight:700;fill:#103f78;font-family:'Inter',Arial,sans-serif}
+    .valuation-hover-line{stroke:#9fb7d6;stroke-width:1;stroke-dasharray:3 3;opacity:0;pointer-events:none;transition:opacity .1s ease}
+    .valuation-hover-dot{fill:#fff;stroke:var(--blue);stroke-width:2;opacity:0;pointer-events:none;transition:opacity .1s ease}
+    .valuation-overlay{fill:transparent;pointer-events:all;cursor:crosshair}
+    .valuation-tooltip{position:absolute;left:0;top:0;pointer-events:none;background:#103f78;color:#fff;font-size:12px;line-height:1.5;padding:7px 11px;border-radius:8px;box-shadow:0 6px 16px rgba(16,63,120,.28);opacity:0;transform:translate(-50%,-115%);white-space:nowrap;transition:opacity .1s ease;z-index:5}
 
     .skeleton{background:linear-gradient(90deg,#edf2f7 25%,#e2e8f0 37%,#edf2f7 63%);background-size:400% 100%;animation:skeleton-loading 1.4s ease infinite;border-radius:8px}.sk-card{height:100px;margin-bottom:16px}.sk-table{height:250px;margin-bottom:16px}
     @keyframes skeleton-loading{0%{background-position:100% 50%}100%{background-position:0 50%}}
@@ -306,11 +314,98 @@
 
     const money = (number, currency = 'EGP') => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(number || 0) + (currency === 'USD' ? ' $' : ' EGP');
     const qty = n => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n || 0);
+    const moneyShort = n => {
+      const abs = Math.abs(n || 0), sign = (n || 0) < 0 ? '-' : '';
+      if (abs >= 1e6) return sign + (abs / 1e6).toFixed(abs >= 1e7 ? 0 : 1) + 'M';
+      if (abs >= 1e3) return sign + (abs / 1e3).toFixed(abs >= 1e4 ? 0 : 1) + 'K';
+      return sign + Math.round(abs);
+    };
+
+    // Company Valuation trend chart: a hand-drawn inline-SVG line chart (no
+    // charting library) - single series, so no legend box is needed (the
+    // card title already names it). Geometry is computed twice on purpose:
+    // once here to draw the static SVG, once in attachValuationChartEvents
+    // to place the hover crosshair - the two must agree on the same
+    // plotting box (VB_LEFT/RIGHT/TOP/BOTTOM below) so the crosshair lines
+    // up with the drawn points.
+    const VB_LEFT = 54, VB_RIGHT = 690, VB_TOP = 22, VB_BOTTOM = 190, VB_W = 760, VB_H = 220;
+    function valuationScales(series) {
+      const values = series.map(s => s.total);
+      let minV = Math.min(...values), maxV = Math.max(...values);
+      if (minV === maxV) { minV -= Math.max(1, Math.abs(minV) * 0.1); maxV += Math.max(1, Math.abs(maxV) * 0.1); }
+      const pad = (maxV - minV) * 0.12; minV -= pad; maxV += pad;
+      const xFor = i => series.length === 1 ? (VB_LEFT + VB_RIGHT) / 2 : VB_LEFT + i * ((VB_RIGHT - VB_LEFT) / (series.length - 1));
+      const yFor = v => VB_TOP + (VB_BOTTOM - VB_TOP) * (1 - (v - minV) / (maxV - minV));
+      return { minV, maxV, xFor, yFor };
+    }
+
+    function renderValuationChart(series) {
+      if (!series.length) return '<p class="muted-note" style="padding:18px 4px">No monthly history yet - add dated rows to see the trend.</p>';
+      const { minV, maxV, xFor, yFor } = valuationScales(series);
+      const points = series.map((s, i) => ({ x: xFor(i), y: yFor(s.total), label: s.label, total: s.total }));
+      const last = points[points.length - 1];
+      const linePath = 'M' + points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L');
+      const areaPath = `${linePath} L${last.x.toFixed(1)},${VB_BOTTOM} L${points[0].x.toFixed(1)},${VB_BOTTOM} Z`;
+      const midV = (minV + maxV) / 2;
+      const endNearRight = last.x > VB_RIGHT - 60;
+      const endLabelAnchor = endNearRight ? 'end' : 'start';
+      const endLabelX = endNearRight ? last.x - 8 : last.x + 8;
+      const endLabelY = last.y < VB_TOP + 14 ? last.y + 16 : last.y - 10;
+      return `
+        <svg viewBox="0 0 ${VB_W} ${VB_H}" preserveAspectRatio="none" role="img" aria-label="Company valuation by month">
+          <line class="valuation-grid-line" x1="${VB_LEFT}" y1="${VB_TOP}" x2="${VB_RIGHT}" y2="${VB_TOP}"></line>
+          <line class="valuation-grid-line" x1="${VB_LEFT}" y1="${(VB_TOP + VB_BOTTOM) / 2}" x2="${VB_RIGHT}" y2="${(VB_TOP + VB_BOTTOM) / 2}"></line>
+          <line class="valuation-grid-line" x1="${VB_LEFT}" y1="${VB_BOTTOM}" x2="${VB_RIGHT}" y2="${VB_BOTTOM}"></line>
+          <text class="valuation-axis-label" x="${VB_LEFT - 8}" y="${VB_TOP + 4}" text-anchor="end">${esc(moneyShort(maxV))}</text>
+          <text class="valuation-axis-label" x="${VB_LEFT - 8}" y="${(VB_TOP + VB_BOTTOM) / 2 + 4}" text-anchor="end">${esc(moneyShort(midV))}</text>
+          <text class="valuation-axis-label" x="${VB_LEFT - 8}" y="${VB_BOTTOM + 4}" text-anchor="end">${esc(moneyShort(minV))}</text>
+          <path class="valuation-area" d="${areaPath}"></path>
+          <path class="valuation-line" d="${linePath}"></path>
+          <circle class="valuation-end-dot" cx="${last.x.toFixed(1)}" cy="${last.y.toFixed(1)}" r="4"></circle>
+          <text class="valuation-end-label" x="${endLabelX.toFixed(1)}" y="${endLabelY.toFixed(1)}" text-anchor="${endLabelAnchor}">${esc(money(last.total))}</text>
+          <text class="valuation-axis-label" x="${points[0].x.toFixed(1)}" y="${VB_BOTTOM + 22}" text-anchor="start">${esc(points[0].label)}</text>
+          ${points.length > 1 ? `<text class="valuation-axis-label" x="${last.x.toFixed(1)}" y="${VB_BOTTOM + 22}" text-anchor="end">${esc(last.label)}</text>` : ''}
+          <line id="valuationHoverLine" class="valuation-hover-line" x1="0" y1="${VB_TOP}" x2="0" y2="${VB_BOTTOM}"></line>
+          <circle id="valuationHoverDot" class="valuation-hover-dot" cx="0" cy="0" r="5"></circle>
+          <rect id="valuationOverlay" class="valuation-overlay" x="${VB_LEFT}" y="0" width="${VB_RIGHT - VB_LEFT}" height="${VB_H}"></rect>
+        </svg>
+        <div class="valuation-tooltip" id="valuationTooltip"></div>`;
+    }
+
+    function attachValuationChartEvents(series) {
+      const overlay = document.getElementById('valuationOverlay');
+      if (!overlay || series.length < 2) return; // single point/empty: static chart, no crosshair needed
+      const hoverLine = document.getElementById('valuationHoverLine');
+      const hoverDot = document.getElementById('valuationHoverDot');
+      const tooltip = document.getElementById('valuationTooltip');
+      const svg = overlay.ownerSVGElement;
+      const { xFor, yFor } = valuationScales(series);
+
+      const showAt = index => {
+        const point = series[index];
+        const x = xFor(index), y = yFor(point.total);
+        hoverLine.setAttribute('x1', x); hoverLine.setAttribute('x2', x); hoverLine.style.opacity = 1;
+        hoverDot.setAttribute('cx', x); hoverDot.setAttribute('cy', y); hoverDot.style.opacity = 1;
+        tooltip.innerHTML = `<strong>${esc(point.label)}</strong><br>${esc(money(point.total))}`;
+        tooltip.style.opacity = 1;
+        const rect = svg.getBoundingClientRect();
+        tooltip.style.left = (x * (rect.width / VB_W)) + 'px';
+        tooltip.style.top = (y * (rect.height / VB_H)) + 'px';
+      };
+      const hide = () => { hoverLine.style.opacity = 0; hoverDot.style.opacity = 0; tooltip.style.opacity = 0; };
+
+      overlay.onmousemove = event => {
+        const rect = svg.getBoundingClientRect();
+        const relX = (event.clientX - rect.left) / rect.width * VB_W;
+        let nearest = 0, nearestDist = Infinity;
+        series.forEach((s, i) => { const dist = Math.abs(xFor(i) - relX); if (dist < nearestDist) { nearestDist = dist; nearest = i; } });
+        showAt(nearest);
+      };
+      overlay.onmouseleave = hide;
+    }
 
     function renderOwners(data, valuation) {
-      const maxEgp = Math.max(...data.owners.map(o => Math.abs(o.totalEgp)), 1);
       const rows = data.owners.map(o => `<tr><td><span class="owner-name"><span class="avatar">${esc(o.owner.slice(0, 2).toUpperCase())}</span>${esc(o.owner)}</span></td><td>${money(o.cashEgp)}</td><td style="color:#1467d2">${money(o.cashUsd, 'USD')}</td><td><strong>${money(o.totalEgp)}</strong></td><td>${money(o.chequesEgp)}</td></tr>`).join('') || '<tr><td colspan="5">No payment rows found.</td></tr>';
-      const bars = data.owners.map(o => `<div class="owner-bar-row"><strong>${esc(o.owner)}</strong><div class="owner-bar-track"><div class="owner-bar-fill" style="width:${Math.min(100, Math.abs(o.totalEgp) / maxEgp * 100)}%"></div></div><span>${money(o.totalEgp)}</span></div>`).join('') || '<p class="muted-note">No data available.</p>';
 
       const dueBadge = status => status === 'Yes' ? '<span class="badge badge-due">Due</span>' : status === 'Done' ? '<span class="badge badge-done">Cleared</span>' : '<span class="badge badge-none">-</span>';
       const chequeRows = data.chequeRows.map(r => `<tr class="searchable ${r.dueStatus === 'Yes' ? 'row-due' : ''}"><td>${esc(r.dueDate || '-')}</td><td>${esc(r.owner)}</td><td>${esc(r.customer)}</td><td>${esc(r.reference)}</td><td>${money(r.egp)}</td><td>${dueBadge(r.dueStatus)}</td></tr>`).join('') || '<tr><td colspan="6">No cheques found.</td></tr>';
@@ -318,8 +413,8 @@
 
       const hasRange = !!(data.range.from || data.range.to);
       const rangeLabel = hasRange ? (data.range.from || 'start') + ' → ' + (data.range.to || 'today') : 'All-time';
-      const v = valuation && valuation.parts ? valuation.parts : { stockAvailMain: 0, paymentEgp: 0, customerBalance: 0, supplierBalance: 0, paymentUsdEgp: 0, stockInNotDelivered: 0 };
       const valuationTotal = valuation ? valuation.total : 0;
+      const series = valuation && valuation.series ? valuation.series : [];
 
       document.getElementById('main').innerHTML = `
         <section class="owners-hero">
@@ -354,38 +449,20 @@
             ${document.getElementById('newEntryBtn').classList.contains('hidden') ? '' : `<button class="primary" onclick="openEntryModal('database','Database','Add Database Entry')">+ New entry</button>`}
           </div>
         </div>
-        <div class="stats">
-          <div class="card"><div class="label">Cash EGP</div><div class="value">${money(data.totals.cashEgp)}</div></div>
-          <div class="card"><div class="label">Cash USD</div><div class="value">${money(data.totals.cashUsd, 'USD')}</div></div>
-          <div class="card"><div class="label">Total Cash EGP</div><div class="value">${money(data.totals.totalEgp)}</div></div>
-        </div>
-        <div class="owners-grid">
-          <section class="owner-card">
-            <div class="table-heading"><h2>Account Statement</h2><span class="mini-chip">Payment rows only</span></div>
-            <div class="table-card">
-              <table class="account-table">
-                <thead><tr><th>Owner</th><th>Cash EGP</th><th>Cash USD</th><th>Total Cash EGP</th><th>Cheques EGP</th></tr></thead>
-                <tbody>${rows}</tbody>
-                <tfoot><tr><td>Grand total</td><td>${money(data.totals.cashEgp)}</td><td>${money(data.totals.cashUsd, 'USD')}</td><td>${money(data.totals.totalEgp)}</td><td>${money(data.totals.chequesEgp)}</td></tr></tfoot>
-              </table>
-            </div>
-          </section>
-          <section class="owner-card">
-            <h2>EGP Distribution</h2>
-            <div class="owner-bars">${bars}</div>
-          </section>
-        </div>
-        <section class="owner-card valuation-card">
-          <div class="table-heading"><h2>Company Valuation</h2><span class="mini-chip">All-time snapshot</span></div>
-          <div class="valuation-total">${money(valuationTotal)}</div>
-          <div class="valuation-breakdown">
-            <div class="valuation-row"><span>Stock Avail Qty (Main Items) × 9</span><span>${money(v.stockAvailMain * 9)}</span></div>
-            <div class="valuation-row"><span>+ Payment EGP</span><span>${money(v.paymentEgp)}</span></div>
-            <div class="valuation-row"><span>+ Customer Total Balance EGP</span><span>${money(v.customerBalance)}</span></div>
-            <div class="valuation-row"><span>&minus; Suppliers Total Balance EGP</span><span>${money(v.supplierBalance)}</span></div>
-            <div class="valuation-row"><span>+ Payment USD EGP</span><span>${money(v.paymentUsdEgp)}</span></div>
-            <div class="valuation-row"><span>&minus; Stock In Not Delivered EGP</span><span>${money(v.stockInNotDelivered)}</span></div>
+        <section class="owner-card">
+          <div class="table-heading"><h2>Account Statement</h2><span class="mini-chip">Payment rows only</span></div>
+          <div class="table-card">
+            <table class="account-table">
+              <thead><tr><th>Owner</th><th>Cash EGP</th><th>Cash USD</th><th>Total Cash EGP</th><th>Cheques EGP</th></tr></thead>
+              <tbody>${rows}</tbody>
+              <tfoot><tr><td>Grand total</td><td>${money(data.totals.cashEgp)}</td><td>${money(data.totals.cashUsd, 'USD')}</td><td>${money(data.totals.totalEgp)}</td><td>${money(data.totals.chequesEgp)}</td></tr></tfoot>
+            </table>
           </div>
+        </section>
+        <section class="owner-card valuation-card">
+          <div class="table-heading"><h2>Company Valuation</h2><span class="mini-chip">All-time, monthly trend</span></div>
+          <div class="valuation-total">${money(valuationTotal)}</div>
+          <div class="valuation-chart-wrap" id="valuationChartWrap">${renderValuationChart(series)}</div>
         </section>
         <div class="cash-layout">
           <section class="owner-card">
@@ -413,6 +490,7 @@
             </div>
           </section>
         </div>`;
+      attachValuationChartEvents(series);
     }
 
     let stockState = { data: null, supplier: 'All', zipperType: '', reference: '', search: '' };
